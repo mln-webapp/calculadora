@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Minimalista</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonte Inter para tipografia impecável -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        /* Ocultar barra de rolagem se houver */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-neutral-950 text-neutral-100 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Container Principal da Calculadora -->
+    <div class="w-full max-w-xs md:max-w-sm bg-neutral-900 border border-neutral-800/80 rounded-3xl p-6 shadow-2xl backdrop-blur-lg">
+        
+        <!-- Display de Operação e Resultado -->
+        <div class="flex flex-col justify-end items-end h-28 mb-6 px-4 py-2 bg-neutral-950/60 rounded-2xl border border-neutral-800/40 overflow-hidden">
+            <!-- Expressão Atual / Histórico curto -->
+            <div id="expression" class="text-neutral-500 text-sm md:text-base font-light tracking-wide min-h-[1.5rem] break-all text-right leading-tight transition-all"></div>
+            <!-- Visor Principal -->
+            <div id="display" class="text-neutral-100 text-3xl md:text-4xl font-normal tracking-tight break-all text-right leading-none mt-1">0</div>
+        </div>
+
+        <!-- Teclado da Calculadora -->
+        <div class="grid grid-cols-4 gap-3" id="keypad">
+            <!-- Linha 1 -->
+            <button data-action="clear" class="btn font-medium text-rose-400 bg-neutral-800/60 hover:bg-neutral-800 active:bg-neutral-700/80 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">C</button>
+            <button data-action="toggle-sign" class="btn font-medium text-neutral-300 bg-neutral-800/60 hover:bg-neutral-800 active:bg-neutral-700/80 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">+/-</button>
+            <button data-action="percent" class="btn font-medium text-neutral-300 bg-neutral-800/60 hover:bg-neutral-800 active:bg-neutral-700/80 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">%</button>
+            <button data-action="operator" data-value="/" class="btn font-medium text-amber-500 bg-neutral-800/60 hover:bg-neutral-800 active:bg-neutral-700/80 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">÷</button>
+
+            <!-- Linha 2 -->
+            <button data-action="number" data-value="7" class="btn font-normal text-neutral-100 bg-neutral-800/30 hover:bg-neutral-800/80 active:bg-neutral-700 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">7</button>
+            <button data-action="number" data-value="8" class="btn font-normal text-neutral-100 bg-neutral-800/30 hover:bg-neutral-800/80 active:bg-neutral-700 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">8</button>
+            <button data-action="number" data-value="9" class="btn font-normal text-neutral-100 bg-neutral-800/30 hover:bg-neutral-800/80 active:bg-neutral-700 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">9</button>
+            <button data-action="operator" data-value="*" class="btn font-medium text-amber-500 bg-neutral-800/60 hover:bg-neutral-800 active:bg-neutral-700/80 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">×</button>
+
+            <!-- Linha 3 -->
+            <button data-action="number" data-value="4" class="btn font-normal text-neutral-100 bg-neutral-800/30 hover:bg-neutral-800/80 active:bg-neutral-700 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">4</button>
+            <button data-action="number" data-value="5" class="btn font-normal text-neutral-100 bg-neutral-800/30 hover:bg-neutral-800/80 active:bg-neutral-700 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">5</button>
+            <button data-action="number" data-value="6" class="btn font-normal text-neutral-100 bg-neutral-800/30 hover:bg-neutral-800/80 active:bg-neutral-700 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">6</button>
+            <button data-action="operator" data-value="-" class="btn font-medium text-amber-500 bg-neutral-800/60 hover:bg-neutral-800 active:bg-neutral-700/80 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">−</button>
+
+            <!-- Linha 4 -->
+            <button data-action="number" data-value="1" class="btn font-normal text-neutral-100 bg-neutral-800/30 hover:bg-neutral-800/80 active:bg-neutral-700 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">1</button>
+            <button data-action="number" data-value="2" class="btn font-normal text-neutral-100 bg-neutral-800/30 hover:bg-neutral-800/80 active:bg-neutral-700 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">2</button>
+            <button data-action="number" data-value="3" class="btn font-normal text-neutral-100 bg-neutral-800/30 hover:bg-neutral-800/80 active:bg-neutral-700 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">3</button>
+            <button data-action="operator" data-value="+" class="btn font-medium text-amber-500 bg-neutral-800/60 hover:bg-neutral-800 active:bg-neutral-700/80 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">+</button>
+
+            <!-- Linha 5 -->
+            <button data-action="number" data-value="0" class="btn font-normal text-neutral-100 bg-neutral-800/30 hover:bg-neutral-800/80 active:bg-neutral-700 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm col-span-1">0</button>
+            <button data-action="decimal" class="btn font-normal text-neutral-100 bg-neutral-800/30 hover:bg-neutral-800/80 active:bg-neutral-700 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm">,</button>
+            <button data-action="backspace" class="btn font-medium text-neutral-400 bg-neutral-800/30 hover:bg-neutral-800/80 active:bg-neutral-700 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-sm" aria-label="Apagar">⌫</button>
+            <button data-action="calculate" class="btn font-semibold text-neutral-950 bg-amber-500 hover:bg-amber-400 active:bg-amber-600 rounded-2xl p-4 text-lg md:text-xl transition-all duration-150 flex items-center justify-center active:scale-95 shadow-md shadow-amber-500/10">=</button>
+        </div>
+    </div>
+
+    <script>
+        // Estado da Calculadora
+        let currentValue = '0';
+        let previousValue = null;
+        let operator = null;
+        let waitingForOperand = false;
+
+        // Elementos da DOM
+        const displayElement = document.getElementById('display');
+        const expressionElement = document.getElementById('expression');
+        const keypad = document.getElementById('keypad');
+
+        // Atualizar Visor
+        function updateDisplay() {
+            displayElement.innerText = currentValue.replace('.', ',');
+            
+            // Exibir a expressão em andamento
+            if (operator && previousValue !== null) {
+                const opSymbol = getOperatorSymbol(operator);
+                if (waitingForOperand) {
+                    expressionElement.innerText = `${formatNumber(previousValue)} ${opSymbol}`;
+                } else {
+                    expressionElement.innerText = `${formatNumber(previousValue)} ${opSymbol} ${formatNumber(currentValue)}`;
+                }
+            } else {
+                expressionElement.innerText = '';
+            }
+        }
+
+        // Formatar número para exibição limpa no histórico
+        function formatNumber(valStr) {
+            return valStr.toString().replace('.', ',');
+        }
+
+        // Obter símbolo visual do operador
+        function getOperatorSymbol(op) {
+            switch(op) {
+                case '+': return '+';
+                case '-': return '−';
+                case '*': return '×';
+                case '/': return '÷';
+                default: return '';
+            }
+        }
+
+        // Adicionar Digitos
+        function inputDigit(digit) {
+            if (waitingForOperand) {
+                currentValue = digit;
+                waitingForOperand = false;
+            } else {
+                if (currentValue === '0') {
+                    currentValue = digit;
+                } else {
+                    // Limita a 12 dígitos para evitar estouro de layout
+                    if (currentValue.length < 12) {
+                        currentValue += digit;
+                    }
+                }
+            }
+            updateDisplay();
+        }
+
+        // Ponto Decimal
+        function inputDecimal() {
+            if (waitingForOperand) {
+                currentValue = '0.';
+                waitingForOperand = false;
+                updateDisplay();
+                return;
+            }
+
+            if (!currentValue.includes('.')) {
+                currentValue += '.';
+                updateDisplay();
+            }
+        }
+
+        // Apagar Último Caractere (Backspace)
+        function handleBackspace() {
+            if (waitingForOperand) return;
+            
+            if (currentValue.length > 1) {
+                currentValue = currentValue.slice(0, -1);
+            } else {
+                currentValue = '0';
+            }
+            updateDisplay();
+        }
+
+        // Alternar Sinal (+/-)
+        function toggleSign() {
+            currentValue = (parseFloat(currentValue) * -1).toString();
+            updateDisplay();
+        }
+
+        // Porcentagem
+        function handlePercent() {
+            const current = parseFloat(currentValue);
+            if (isNaN(current)) return;
+
+            if (previousValue !== null && operator) {
+                // Cálculo contextual de porcentagem (ex: 100 + 10% = 110)
+                const prev = parseFloat(previousValue);
+                if (operator === '+' || operator === '-') {
+                    currentValue = ((prev * current) / 100).toString();
+                } else {
+                    currentValue = (current / 100).toString();
+                }
+            } else {
+                currentValue = (current / 100).toString();
+            }
+            updateDisplay();
+        }
+
+        // Manipulação de Operadores
+        function handleOperator(nextOperator) {
+            const inputValue = parseFloat(currentValue);
+
+            if (operator && waitingForOperand) {
+                operator = nextOperator;
+                updateDisplay();
+                return;
+            }
+
+            if (previousValue === null && !isNaN(inputValue)) {
+                previousValue = currentValue;
+            } else if (operator) {
+                const result = performCalculation();
+                currentValue = String(result);
+                previousValue = currentValue;
+            }
+
+            waitingForOperand = true;
+            operator = nextOperator;
+            updateDisplay();
+        }
+
+        // Executar Cálculo
+        function performCalculation() {
+            const prev = parseFloat(previousValue);
+            const current = parseFloat(currentValue);
+
+            if (isNaN(prev) || isNaN(current)) return current;
+
+            let result = 0;
+            switch (operator) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    if (current === 0) {
+                        return 'Erro';
+                    }
+                    result = prev / current;
+                    break;
+                default:
+                    return current;
+            }
+
+            // Tratamento para números decimais com arredondamento preciso
+            return Math.round(result * 1e10) / 1e10;
+        }
+
+        // Botão de Igual (=)
+        function handleEqual() {
+            if (!operator || previousValue === null) return;
+
+            const inputValue = currentValue;
+            const result = performCalculation();
+
+            expressionElement.innerText = `${formatNumber(previousValue)} ${getOperatorSymbol(operator)} ${formatNumber(inputValue)} =`;
+            currentValue = String(result);
+            previousValue = null;
+            operator = null;
+            waitingForOperand = true;
+
+            displayElement.innerText = currentValue.replace('.', ',');
+        }
+
+        // Limpar Tudo (Clear)
+        function clearAll() {
+            currentValue = '0';
+            previousValue = null;
+            operator = null;
+            waitingForOperand = false;
+            updateDisplay();
+        }
+
+        // Event Listener para cliques nos botões
+        keypad.addEventListener('click', (event) => {
+            const button = event.target.closest('button');
+            if (!button) return;
+
+            const action = button.dataset.action;
+            const value = button.dataset.value;
+
+            switch (action) {
+                case 'number':
+                    inputDigit(value);
+                    break;
+                case 'decimal':
+                    inputDecimal();
+                    break;
+                case 'operator':
+                    handleOperator(value);
+                    break;
+                case 'calculate':
+                    handleEqual();
+                    break;
+                case 'clear':
+                    clearAll();
+                    break;
+                case 'backspace':
+                    handleBackspace();
+                    break;
+                case 'toggle-sign':
+                    toggleSign();
+                    break;
+                case 'percent':
+                    handlePercent();
+                    break;
+            }
+        });
+
+        // Suporte Completo a Teclado Físico
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+
+            // Números (0-9)
+            if (/^[0-9]$/.test(key)) {
+                event.preventDefault();
+                inputDigit(key);
+                animateButton(`[data-action="number"][data-value="${key}"]`);
+            }
+            // Operadores
+            else if (key === '+') {
+                event.preventDefault();
+                handleOperator('+');
+                animateButton('[data-action="operator"][data-value="+"]');
+            } else if (key === '-') {
+                event.preventDefault();
+                handleOperator('-');
+                animateButton('[data-action="operator"][data-value="-"]');
+            } else if (key === '*') {
+                event.preventDefault();
+                handleOperator('*');
+                animateButton('[data-action="operator"][data-value="*"]');
+            } else if (key === '/') {
+                event.preventDefault();
+                handleOperator('/');
+                animateButton('[data-action="operator"][data-value="/"]');
+            }
+            // Vírgula ou Ponto
+            else if (key === '.' || key === ',') {
+                event.preventDefault();
+                inputDecimal();
+                animateButton('[data-action="decimal"]');
+            }
+            // Enter ou '=' para Resultado
+            else if (key === 'Enter' || key === '=') {
+                event.preventDefault();
+                handleEqual();
+                animateButton('[data-action="calculate"]');
+            }
+            // Backspace para Apagar Único
+            else if (key === 'Backspace') {
+                event.preventDefault();
+                handleBackspace();
+                animateButton('[data-action="backspace"]');
+            }
+            // Escape para Limpar Tudo (Clear)
+            else if (key === 'Escape') {
+                event.preventDefault();
+                clearAll();
+                animateButton('[data-action="clear"]');
+            }
+            // Porcentagem
+            else if (key === '%') {
+                event.preventDefault();
+                handlePercent();
+                animateButton('[data-action="percent"]');
+            }
+        });
+
+        // Feedback visual quando pressionado pelo teclado
+        function animateButton(selector) {
+            const btn = document.querySelector(selector);
+            if (btn) {
+                btn.classList.add('scale-95', 'brightness-125');
+                setTimeout(() => {
+                    btn.classList.remove('scale-95', 'brightness-125');
+                }, 100);
+            }
+        }
+
+        // Inicializar
+        updateDisplay();
+    </script>
+</body>
+</html>
